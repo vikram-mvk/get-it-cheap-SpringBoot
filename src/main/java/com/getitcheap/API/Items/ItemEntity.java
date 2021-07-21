@@ -37,6 +37,10 @@ public class ItemEntity {
 
     private String username;
 
+    private String itemLocation;
+
+    private int addressId;
+
     public Long getId() {
         return id;
     }
@@ -95,6 +99,27 @@ public class ItemEntity {
         this.rentalBasis = rentalBasis;
         return this;
     }
+
+    @JsonProperty("itemLocation")
+    public String getItemLocation() {
+        return itemLocation;
+    }
+
+    public ItemEntity setItemLocation(String itemLocation) {
+        this.itemLocation = itemLocation;
+        return this;
+    }
+
+    @JsonIgnore
+    public int getAddressId() {
+        return addressId;
+    }
+
+    public ItemEntity setAddressId(int addressId) {
+        this.addressId = addressId;
+        return this;
+    }
+
 
     @JsonProperty("image")
     public String getImage() {
@@ -187,6 +212,7 @@ public class ItemEntity {
                         .setUserId(rs.getLong("userId"))
                         .setUsername(rs.getString("username"))
                         .setContact(rs.getString("contact"))
+                        .setItemLocation(rs.getString("itemLocation"))
                         .setDatePosted(rs.getString("datePosted"))
                         .setActive(rs.getInt("active"));
 

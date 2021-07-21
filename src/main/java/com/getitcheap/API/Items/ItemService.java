@@ -15,37 +15,24 @@ public class ItemService {
        return itemRepository.getItem(id);
     }
 
-    public List<ItemEntity> getItems(List<String> itemTypes, List<String> itemCategories) {
-        String itemTypesQuery = "";
-        String itemCategoriesQuery = "";
-        String queryFormat = ",'%s'";
+    public List<ItemEntity> getItems(List<String> itemTypes, List<String> itemCategories, List<String> itemCities,
+                                     List<String> itemStates, List<String> itemZipCodes, List<String> itemCountries) {
+        String itemTypesQuery, itemCategoriesQuery, itemCitiesQuery, itemStatesQuery, itemCountriesQuery, itemZipCodesQuery;
+        boolean hasLocationFilter = false;
 
         try {
-            if (itemTypes == null || itemTypes.size() == 0) {
-                itemTypesQuery = "LIKE '%'";
-            } else {
-
-                for (String type : itemTypes) {
-                    itemTypesQuery += String.format(queryFormat, type);
-                }
-                itemTypesQuery = itemTypesQuery.substring(1);
-                itemTypesQuery = String.format("IN (%s)", itemTypesQuery);
-            }
-
-            if (itemCategories == null || itemCategories.size() == 0) {
-                itemCategoriesQuery = "LIKE '%'";
-            } else {
-
-                for (String category : itemCategories) {
-                    itemCategoriesQuery += String.format(queryFormat, category);
-                }
-                itemCategoriesQuery = itemCategoriesQuery.substring(1);
-                itemCategoriesQuery = String.format("IN (%s)", itemCategoriesQuery);
-            }
+            itemTypesQuery = getSqlQueryString(itemTypes);
+            itemCategoriesQuery = getSqlQueryString(itemCategories);
+            itemCitiesQuery = getSqlQueryString(itemCities);
+            itemStatesQuery = getSqlQueryString(itemStates);
+            itemZipCodesQuery = getSqlQueryString(itemZipCodes);
+            itemCountriesQuery = getSqlQueryString(itemCountries);
+            hasLocationFilter = itemCities != null || itemCountries != null || itemStates != null || itemZipCodes != null;
         } catch (Exception e) {
             return null;
         }
-        return itemRepository.getItems(itemTypesQuery, itemCategoriesQuery);
+        return itemRepository.getItems(hasLocationFilter, itemTypesQuery, itemCategoriesQuery, itemCitiesQuery,
+                itemStatesQuery, itemZipCodesQuery, itemCountriesQuery);
     }
 
     public List<ItemEntity> getUserItems(Long id) {
@@ -64,5 +51,21 @@ public class ItemService {
     }
 
 
+    private String getSqlQueryString(List<String> locationFilterValues) {
+        String queryNoFilter = "LIKE '%'";
+        String query = "";
+        String queryFormat = ",'%s'";
+
+        if (locationFilterValues != null && locationFilterValues.size() > 0) {
+            for (String filterValue : locationFilterValues) {
+                query += String.format(queryFormat, filterValue);
+            }
+            query = query.substring(1);
+            query = String.format("IN (%s)", query);
+        } else {
+            query = queryNoFilter;
+        }
+        return query;
+    }
 
 }

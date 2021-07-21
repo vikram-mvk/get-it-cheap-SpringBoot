@@ -1,7 +1,6 @@
 package com.getitcheap.API.Items;
 
 
-import com.amazonaws.endpointdiscovery.DaemonThreadFactory;
 import com.getitcheap.API.AWS.S3Service;
 import com.getitcheap.API.DTO.MessageResponse;
 import com.getitcheap.API.Utilities;
@@ -27,9 +26,14 @@ public class ItemController {
 
     @GetMapping(ItemRoutes.GET_ITEMS)
     public ResponseEntity<?> getItems(@RequestParam(value = "type", required = false) List<String> itemTypes,
-                                      @RequestParam(value = "category", required = false) List<String> categories ) {
+                                      @RequestParam(value = "category", required = false) List<String> categories,
+                                      @RequestParam(value = "city", required = false) List<String> cities,
+                                      @RequestParam(value = "state", required = false) List<String> states,
+                                      @RequestParam(value = "zipcode", required = false) List<String> zipcodes,
+                                      @RequestParam(value = "country", required = false) List<String> countries
+                                      ) {
 
-        List<ItemEntity> items = itemService.getItems(itemTypes, categories);
+        List<ItemEntity> items = itemService.getItems(itemTypes, categories, cities, states, zipcodes, countries);
         return ResponseEntity.status(200).body(items == null ? new MessageResponse("No Items found") : items);
     }
 
@@ -60,6 +64,7 @@ public class ItemController {
                     .setRentalBasis(req.getParameter("rentalBasis"))
                     .setContact(req.getParameter("contact"))
                     .setUsername(req.getParameter("username"))
+                    .setItemLocation(req.getParameter("itemLocation"))
                     .setUserId(Long.parseLong(req.getParameter("userId")));
 
             if (image != null) {

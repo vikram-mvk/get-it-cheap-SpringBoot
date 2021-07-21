@@ -8,6 +8,16 @@ CREATE TABLE IF NOT EXISTS users(
     PRIMARY KEY (id)
 );
 
+CREATE TABLE IF NOT EXISTS address(
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    itemLocation VARCHAR(255),
+    city VARCHAR(255),
+    state VARCHAR(255),
+    zipcode VARCHAR(255),
+    country VARCHAR(255),
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE IF NOT EXISTS items(
     id BIGINT NOT NULL AUTO_INCREMENT,
     itemName VARCHAR(255) NOT NULL,
@@ -20,8 +30,11 @@ CREATE TABLE IF NOT EXISTS items(
     userId BIGINT NOT NULL,
     username VARCHAR(255) NOT NULL,
     contact VARCHAR(255) NOT NULL,
+    itemLocation VARCHAR(255) NOT NULL,
+    addressId BIGINT,
     datePosted DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    active int NOT NULL,
+    active int,
+    FOREIGN KEY(addressId) REFERENCES address(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY(userId) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY(id)
 );
