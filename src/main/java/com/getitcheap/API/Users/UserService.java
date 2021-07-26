@@ -55,7 +55,7 @@ public class UserService implements UserDetailsService {
 
     public ResponseEntity<?> signUp(UserEntity signupRequest) {
         if (userRepository.existsByEmail(signupRequest.getEmail())) {
-            return ResponseEntity.status(400).body(new MessageResponse("This email address is already registered with us"));
+            return ResponseEntity.status(400).body(new MessageResponse("An account with this Email Id already exists"));
         }
 
         boolean successful = userRepository.signUp(signupRequest.getFirstName(), signupRequest.getLastName(),

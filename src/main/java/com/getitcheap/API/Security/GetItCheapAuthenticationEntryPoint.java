@@ -14,6 +14,11 @@ import java.io.IOException;
 public class GetItCheapAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        httpServletResponse.sendRedirect("/unauthorized");
+        if (httpServletResponse.getStatus() == 429) {
+            httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+
+        } else {
+            httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token. Please Sign in again");
+        }
       }
 }

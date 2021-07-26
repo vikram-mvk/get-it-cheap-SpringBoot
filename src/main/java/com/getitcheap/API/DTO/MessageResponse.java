@@ -1,5 +1,7 @@
 package com.getitcheap.API.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class MessageResponse {
     private String message;
 
@@ -7,6 +9,7 @@ public class MessageResponse {
         this.message = message;
     }
 
+    @JsonProperty("message")
     public String getMessage() {
         return message;
     }

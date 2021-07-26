@@ -10,23 +10,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class JwtTokenService {
 
     private final Logger logger = LoggerFactory.getLogger(JwtTokenService.class);
 
+    private Set<String> invalidTokens = new HashSet<>();
+
     private String jwtSecret = "secretKey";
 
-    private int jwtExpirationMs = 86400000; // 24 Hrs
-
     public String createJwtToken(UserEntity user) {
-
+        LocalDateTime dateTime = LocalDateTime.now();
         return Jwts.builder()
                 .setSubject((user.getUsername()))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .setExpiration( new Date(dateTime.getYear() + 1, dateTime.getMonthValue(), dateTime.getDayOfMonth()))
                 .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
     }
@@ -35,7 +38,7 @@ public class JwtTokenService {
     public void authenticate(HttpServletRequest request) {
         SecurityContextHolder.clearContext();
         String authToken = getJwtFromRequest(request);
-        if (authToken == null) {
+        if (authToken == null || invalidTokens.contains(authToken)) {
             return;
         }
 
@@ -47,6 +50,13 @@ public class JwtTokenService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (Exception e) {
             logger.error("Invalid JWT token: {}", e.getMessage());
+        }
+    }
+
+    public void addToInvalidTokens(HttpServletRequest req) {
+        invalidTokens.add(getJwtFromRequest(req));
+        if (invalidTokens.size() == 100) {
+            invalidTokens.clear();
         }
     }
 

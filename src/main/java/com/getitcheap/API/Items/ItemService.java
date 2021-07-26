@@ -58,6 +58,9 @@ public class ItemService {
 
         if (locationFilterValues != null && locationFilterValues.size() > 0) {
             for (String filterValue : locationFilterValues) {
+                if (filterValue.equals("All")) {
+                    return queryNoFilter;
+                }
                 query += String.format(queryFormat, filterValue);
             }
             query = query.substring(1);

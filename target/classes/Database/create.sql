@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS items(
     id BIGINT NOT NULL AUTO_INCREMENT,
     itemName VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
-    category ENUM('electronics', 'clothing', 'outdoor', 'others') NOT NULL,
+    category ENUM('Electronics', 'Clothing', 'Outdoor', 'Others') NOT NULL,
     itemType ENUM('for_rent', 'for_sale') NOT NULL,
     image VARCHAR(255),
     price DOUBLE(5,2) NOT NULL,
