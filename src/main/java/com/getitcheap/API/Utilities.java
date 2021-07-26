@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class Utilities {
 
-    public static ResponseEntity<?> getSomethingWentWrongResponse() {
+    public static ResponseEntity<MessageResponse> getSomethingWentWrongResponse() {
         return ResponseEntity.status(500).body(new MessageResponse("Something went wrong. Please try again."));
     }
 

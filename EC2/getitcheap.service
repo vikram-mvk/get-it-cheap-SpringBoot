@@ -1,0 +1,17 @@
+[Unit]
+Description=GetItCheap Spring boot Service
+After=mysqld.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/home/ubuntu/getitcheap.sh
+SuccessExitStatus=143
+TimeoutStopSec=10
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

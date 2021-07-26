@@ -25,7 +25,7 @@ public class ItemController {
     S3Service s3Service;
 
     @GetMapping(ItemRoutes.GET_ITEMS)
-    public ResponseEntity<?> getItems(@RequestParam(value = "type", required = false) List<String> itemTypes,
+    public ResponseEntity<List<ItemEntity>> getItems(@RequestParam(value = "type", required = false) List<String> itemTypes,
                                       @RequestParam(value = "category", required = false) List<String> categories,
                                       @RequestParam(value = "city", required = false) List<String> cities,
                                       @RequestParam(value = "state", required = false) List<String> states,
@@ -34,25 +34,25 @@ public class ItemController {
                                       ) {
 
         List<ItemEntity> items = itemService.getItems(itemTypes, categories, cities, states, zipcodes, countries);
-        return ResponseEntity.status(200).body(items == null ? new MessageResponse("No Items found") : items);
+        return ResponseEntity.status(200).body(items);
     }
 
     @GetMapping(ItemRoutes.SEARCH_ITEMS)
-    public ResponseEntity<?> searchItems(@RequestParam(value = "key") String searchKey) {
+    public ResponseEntity<List<ItemEntity>> searchItems(@RequestParam(value = "key") String searchKey) {
 
         List<ItemEntity> items = itemService.searchItems(searchKey);
-        return ResponseEntity.status(200).body(items == null ? new MessageResponse("No Items found") : items);
+        return ResponseEntity.status(200).body(items);
     }
 
     @GetMapping(ItemRoutes.GET_ITEM)
     public ResponseEntity<?> getItem(@PathVariable Long id) {
 
         ItemEntity item = itemService.getItem(id);
-        return ResponseEntity.ok().body(item == null ? new MessageResponse("Item not found") : item);
+        return ResponseEntity.ok().body(item);
     }
 
     @PostMapping(ItemRoutes.NEW_ITEM)
-    public ResponseEntity<?> newItem(@RequestParam(value="image",required = false) MultipartFile image, HttpServletRequest req) {
+    public ResponseEntity<MessageResponse> newItem(@RequestParam(value="image",required = false) MultipartFile image, HttpServletRequest req) {
         try {
             boolean success = false;
             ItemEntity item = new ItemEntity()
@@ -90,10 +90,9 @@ public class ItemController {
     }
 
     @GetMapping(ItemRoutes.USER_ITEM)
-    public ResponseEntity<?> getUserItems(@PathVariable Long id) {
+    public ResponseEntity<List<ItemEntity>> getUserItems(@PathVariable Long id) {
             List<ItemEntity> userItems = itemService.getUserItems(id);
-        return ResponseEntity.status(200).body(userItems == null ? new MessageResponse("This user has not posted any items.")
-                : userItems);
+        return ResponseEntity.status(200).body(userItems);
     }
 
 }
