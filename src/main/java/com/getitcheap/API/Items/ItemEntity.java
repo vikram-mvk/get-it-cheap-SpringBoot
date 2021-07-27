@@ -23,7 +23,7 @@ public class ItemEntity {
 
     private String image;
 
-    private double price;
+    private int price;
 
     private String rentalBasis;
 
@@ -136,7 +136,7 @@ public class ItemEntity {
         return price;
     }
 
-    public ItemEntity setPrice(double price) {
+    public ItemEntity setPrice(int price) {
         this.price = price;
         return this;
     }
@@ -207,7 +207,7 @@ public class ItemEntity {
                         .setCategory(rs.getString("category"))
                         .setItemType(rs.getString("itemType"))
                         .setImage(rs.getString("image"))
-                        .setPrice(rs.getDouble("price"))
+                        .setPrice(rs.getInt("price"))
                         .setRentalBasis(rs.getString("rentalBasis"))
                         .setUserId(rs.getLong("userId"))
                         .setUsername(rs.getString("username"))

@@ -7,6 +7,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Repository
@@ -36,6 +37,7 @@ public class ItemRepository {
             return null;
         } catch (Exception e) {
             logger.error( "Error in getAllItems()\n" + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -48,6 +50,7 @@ public class ItemRepository {
             return null;
         } catch (Exception e) {
             logger.error( "Error in getItemsOfThisUser()\n" + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -60,6 +63,7 @@ public class ItemRepository {
             return null;
         } catch (Exception e) {
             logger.error( "Error in getItem()\n" + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -76,6 +80,7 @@ public class ItemRepository {
             return null;
         } catch (Exception e) {
             logger.error( "Error in searchItems()\n" + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -119,6 +124,7 @@ public class ItemRepository {
             return false;
         } catch (Exception e) {
             logger.error( "Error in newItem()\n" + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }

@@ -38,7 +38,7 @@ public class JwtTokenService {
     public void authenticate(HttpServletRequest request) {
         SecurityContextHolder.clearContext();
         String authToken = getJwtFromRequest(request);
-        if (authToken == null || invalidTokens.contains(authToken)) {
+        if (authToken == null) {
             return;
         }
 

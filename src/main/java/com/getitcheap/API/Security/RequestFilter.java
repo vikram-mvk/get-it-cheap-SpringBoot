@@ -48,11 +48,6 @@ public class RequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        checkTooManyRequests(request);
-        if(blockedIps.contains(getClientIpAddress(request))) {
-            jwtTokenService.addToInvalidTokens(request);
-            response.sendError(429);
-        }
         jwtTokenService.authenticate(request);
         filterChain.doFilter(request, response);
     }

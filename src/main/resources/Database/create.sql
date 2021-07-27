@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS items(
     category ENUM('Electronics', 'Clothing', 'Outdoor', 'Others') NOT NULL,
     itemType ENUM('for_rent', 'for_sale') NOT NULL,
     image VARCHAR(255),
-    price DOUBLE(5,2) NOT NULL,
+    price int NOT NULL,
     rentalBasis ENUM('per_hour', 'per_day', 'per_week', 'per_month'),
     userId BIGINT NOT NULL,
     username VARCHAR(255) NOT NULL,

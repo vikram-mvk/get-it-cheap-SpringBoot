@@ -58,7 +58,7 @@ public class ItemController {
             ItemEntity item = new ItemEntity()
                     .setItemName(req.getParameter("itemName"))
                     .setDescription(req.getParameter("description"))
-                    .setPrice(Double.parseDouble(req.getParameter("price")))
+                    .setPrice(Integer.parseInt(req.getParameter("price")))
                     .setCategory(req.getParameter("category"))
                     .setItemType(req.getParameter("itemType"))
                     .setRentalBasis(req.getParameter("rentalBasis"))
@@ -72,10 +72,10 @@ public class ItemController {
                 String imageName = item.getItemName() + "_" + new Date().getTime() + ".jpeg";
 
                 success = s3Service.uploadFile(imageName, imageFile);
-
                 if (success) {
                     item.setImage(imageName);
                 }
+                imageFile.delete();
             }
 
             success = itemService.newItem(item);
@@ -83,7 +83,7 @@ public class ItemController {
             return success ? ResponseEntity.status(200).body(new MessageResponse("Successful")) :
                     Utilities.getSomethingWentWrongResponse();
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
         return Utilities.getSomethingWentWrongResponse();
