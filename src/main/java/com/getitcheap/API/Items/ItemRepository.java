@@ -110,25 +110,20 @@ public class ItemRepository {
     boolean newItem(ItemEntity item) {
 
         try {
-            String[] location = new String[5];
-            int i = 0;
-            for (String addressPart : item.getItemLocation().split(",")) {
-                addressPart = addressPart.strip();
-                if (i == 2) {
-                    String temp[] = addressPart.split(" ");
-                    String state = null;
-                    String zipcode = null;
-                    state = temp[0].strip();
-                    if (temp.length == 2) {
-                        zipcode = temp[1].strip();
-                    }
-                    location[i] = state;
-                    location[i + 1] = zipcode;
-                    i += 2;
-                } else {
-                    location[i] = addressPart;
-                    i++;
-                }
+            String[] addressParts = item.getItemLocation().split(";");
+
+            String country = addressParts[addressParts.length-1].strip();
+            String state = addressParts[addressParts.length -2].strip();
+            String zipcode = null;
+            if (state.split(" ").length == 2) {
+                String[] temp = state.split(" ");
+                state = temp[0];
+                zipcode = temp[1];
+            }
+            String city = addressParts[addressParts.length -3].strip();
+            String localityOrHouseAddress = null;
+            if (addressParts.length == 4) {
+                localityOrHouseAddress = addressParts[addressParts.length - 4].strip();
             }
 
             String insertItemSql = "INSERT INTO items(itemName, description, category, itemType, image, price, rentalBasis, userId,"
@@ -145,8 +140,8 @@ public class ItemRepository {
 
                 // VALUES (id, houseAddress, street, city, state, zipcode, country)
                 String insertAddressSQL = "INSERT INTO address VALUES (DEFAULT, %d, '%s', '%s', '%s', '%s', '%s')";
-                insertAddressSQL = String.format(insertAddressSQL, itemId, location[0], location[1], location[2],
-                        location[3], location[4]);
+                insertAddressSQL = String.format(insertAddressSQL, itemId, localityOrHouseAddress, city, state,
+                        zipcode, country);
                 jdbcTemplate.update(insertAddressSQL);
             } catch (Exception e) {
                 logger.error( "Error in newItem() addressInsertion\n" + e.getMessage());
