@@ -10,7 +10,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
 import java.nio.file.Files;
 
 @SpringBootApplication
@@ -30,8 +32,8 @@ public class GetItCheapApiApplication implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) {
 		try {
-			Resource database =  new ClassPathResource("/Database/create.sql");
-			String fileContents = Files.readString(database.getFile().toPath());
+			File sqlSetup = ResourceUtils.getFile("classpath:Database/create.sql");
+			String fileContents =  Files.readString(sqlSetup.toPath());
 			for (String query : fileContents.split(";")) {
 				jdbcTemplate.execute(query);
 			}
