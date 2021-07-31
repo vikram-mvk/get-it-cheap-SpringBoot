@@ -110,22 +110,7 @@ public class ItemRepository {
     boolean newItem(ItemEntity item) {
 
         try {
-            String[] addressParts = item.getItemLocation().split(";");
-
-            String country = addressParts[addressParts.length-1].strip();
-            String state = addressParts[addressParts.length -2].strip();
-            String zipcode = null;
-            if (state.split(" ").length == 2) {
-                String[] temp = state.split(" ");
-                state = temp[0];
-                zipcode = temp[1];
-            }
-            String city = addressParts[addressParts.length -3].strip();
-            String localityOrHouseAddress = null;
-            if (addressParts.length == 4) {
-                localityOrHouseAddress = addressParts[addressParts.length - 4].strip();
-            }
-
+            // First insert the item
             String insertItemSql = "INSERT INTO items(itemName, description, category, itemType, image, price, rentalBasis, userId,"
                     + " username, contact, itemLocation, datePosted, active) " +
                     "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DEFAULT, 1)";
@@ -134,20 +119,41 @@ public class ItemRepository {
                     item.getItemName(), item.getDescription(), item.getCategory(), item.getItemType(), item.getImage(),
                     item.getPrice(), item.getRentalBasis(), item.getUserId(), item.getUsername(), item.getContact(),
                     item.getItemLocation()) > 0;
-            try {
-                String itemIdSql = "SELECT max(id) FROM items WHERE userId = ?";
-                int itemId = jdbcTemplate.queryForObject(itemIdSql, Integer.class, new Object[]{item.getUserId()});
 
-                // VALUES (id, houseAddress, street, city, state, zipcode, country)
-                String insertAddressSQL = "INSERT INTO address VALUES (DEFAULT, %d, '%s', '%s', '%s', '%s', '%s')";
-                insertAddressSQL = String.format(insertAddressSQL, itemId, localityOrHouseAddress, city, state,
-                        zipcode, country);
-                jdbcTemplate.update(insertAddressSQL);
+            try { // Inserting address in table is optional. Only filter won't work for this item, if it fails.
+                if (itemInsertSuccess) {
+                    String[] addressParts = item.getItemLocation().strip().split(",");
+                    String country = null;
+                    String state = null;
+                    String zipcode = null;
+                    String city = null;
+                    String localityOrHouseAddress = null;
+                    try {
+                        // Try to parse address
+                        country = addressParts[addressParts.length-1].strip();
+                        String[] temp = addressParts[addressParts.length -2].strip().split(" ");
+                        state = temp[0];
+                        if (temp.length == 2) {
+                            zipcode = temp[1];
+                        }
+                        city = addressParts[addressParts.length -3].strip();
+                        localityOrHouseAddress = addressParts[addressParts.length - 4].strip();
+                    } catch (Exception e) {
+                        // ignore
+                    }
+                    String itemIdSql = "SELECT max(id) FROM items WHERE userId = ?";
+                    int itemId = jdbcTemplate.queryForObject(itemIdSql, Integer.class, new Object[]{item.getUserId()});
+                    String insertAddressSQL = "INSERT INTO address VALUES (DEFAULT, %d, '%s', '%s', '%s', '%s', '%s')";
+                    insertAddressSQL = String.format(insertAddressSQL, itemId, localityOrHouseAddress, city, state,
+                            zipcode, country);
+                    jdbcTemplate.update(insertAddressSQL);
+                }
             } catch (Exception e) {
                 logger.error( "Error in newItem() addressInsertion\n" + e.getMessage());
                 e.printStackTrace();
             }
             return itemInsertSuccess;
+
         } catch (EmptyResultDataAccessException e) {
             return false;
         } catch (Exception e) {
