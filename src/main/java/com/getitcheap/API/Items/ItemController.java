@@ -2,6 +2,7 @@ package com.getitcheap.API.Items;
 
 
 import com.getitcheap.API.AWS.S3Service;
+import com.getitcheap.API.DTO.DeleteItemsRequest;
 import com.getitcheap.API.DTO.MessageResponse;
 import com.getitcheap.API.Utilities;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,9 +91,16 @@ public class ItemController {
     }
 
     @GetMapping(ItemRoutes.USER_ITEM)
-    public ResponseEntity<List<ItemEntity>> getUserItems(@PathVariable Long id) {
+    public ResponseEntity<List<ItemEntity>> getUserItems(@PathVariable("userId") Long id) {
             List<ItemEntity> userItems = itemService.getUserItems(id);
         return ResponseEntity.status(200).body(userItems);
+    }
+
+    @PostMapping(ItemRoutes.DELETE_ITEMS)
+    public ResponseEntity<MessageResponse> deleteItems(@RequestBody DeleteItemsRequest request) {
+        List<Long> ids = request.getIds();
+        itemService.deleteItems(ids);
+        return ResponseEntity.status(200).body(new MessageResponse("Item Successfully deleted"));
     }
 
 }

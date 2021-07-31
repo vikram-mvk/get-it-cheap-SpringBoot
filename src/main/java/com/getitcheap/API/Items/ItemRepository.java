@@ -25,8 +25,8 @@ public class ItemRepository {
         try {
             String sql;
             if (hasLocationFilter) {
-                sql = "SELECT * FROM items WHERE itemType %s AND category %s AND active = 1 AND addressId " +
-                        "IN (select id from address WHERE city %s AND state %s AND zipcode %s AND country %s)";
+                sql = "SELECT * FROM items WHERE active = 1 AND id " +
+                        "IN (select itemId from address WHERE city %s AND state %s AND zipcode %s AND country %s)";
                 sql = String.format(sql, itemTypes, categories, itemCities, itemStates, itemZipCodes, itemCountries);
             } else {
                 sql = "SELECT * FROM items WHERE itemType %s AND category %s AND active = 1";
@@ -85,41 +85,74 @@ public class ItemRepository {
         }
     }
 
+    boolean deleteItems(List<Long> ids) {
+        if (ids == null) {return false;}
+        boolean success = true;
+        String sql = "DELETE from items where id = ?";
+        try {
+
+            for (Long id : ids) {
+                success = success && (jdbcTemplate.update(sql, id) > 0);
+                if (!success) {
+                    break;
+                }
+            }
+            return success;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        } catch (Exception e) {
+            logger.error("Error in newItem()\n" + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     boolean newItem(ItemEntity item) {
+
         try {
             String[] location = new String[5];
-            int i =0;
-            for (String addressPart :item.getItemLocation().split(",")) {
+            int i = 0;
+            for (String addressPart : item.getItemLocation().split(",")) {
                 addressPart = addressPart.strip();
-                if(i==2) {
+                if (i == 2) {
                     String temp[] = addressPart.split(" ");
-                    String state = temp[0].strip();
-                    String zipcode =  temp[1].strip();
+                    String state = null;
+                    String zipcode = null;
+                    state = temp[0].strip();
+                    if (temp.length == 2) {
+                        zipcode = temp[1].strip();
+                    }
                     location[i] = state;
-                    location [i+1] =zipcode;
-                    i+=2;
+                    location[i + 1] = zipcode;
+                    i += 2;
                 } else {
                     location[i] = addressPart;
                     i++;
                 }
             }
-            int addressId = -1;
-            // VALUES (id, houseAddress, street, city, state, zipcode, country)
-            String insertAddressSQL = "INSERT INTO address VALUES (DEFAULT, '%s', '%s', '%s', '%s', '%s')";
-            insertAddressSQL = String.format(insertAddressSQL, location[0], location[1], location[2], location[3], location[4]);
-            boolean addressInsetSuccess = jdbcTemplate.update(insertAddressSQL) > 0;
-            String lastInsertedIdSQL = "SELECT max(id) FROM address WHERE itemLocation LIKE '%s'";
-            lastInsertedIdSQL = String.format(lastInsertedIdSQL, location[0]);
-            addressId = jdbcTemplate.queryForObject(lastInsertedIdSQL, Integer.class);
 
-            String sql = "INSERT INTO items(itemName, description, category, itemType, image, price, rentalBasis, userId,"
-                    + " username, contact, itemLocation, addressId, datePosted, active) " +
-                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DEFAULT, 1)";
+            String insertItemSql = "INSERT INTO items(itemName, description, category, itemType, image, price, rentalBasis, userId,"
+                    + " username, contact, itemLocation, datePosted, active) " +
+                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DEFAULT, 1)";
 
-            return addressInsetSuccess && (jdbcTemplate.update(sql,
+            boolean itemInsertSuccess = jdbcTemplate.update(insertItemSql,
                     item.getItemName(), item.getDescription(), item.getCategory(), item.getItemType(), item.getImage(),
                     item.getPrice(), item.getRentalBasis(), item.getUserId(), item.getUsername(), item.getContact(),
-                    item.getItemLocation(), addressId) > 0);
+                    item.getItemLocation()) > 0;
+            try {
+                String itemIdSql = "SELECT max(id) FROM items WHERE userId = ?";
+                int itemId = jdbcTemplate.queryForObject(itemIdSql, Integer.class, new Object[]{item.getUserId()});
+
+                // VALUES (id, houseAddress, street, city, state, zipcode, country)
+                String insertAddressSQL = "INSERT INTO address VALUES (DEFAULT, %d, '%s', '%s', '%s', '%s', '%s')";
+                insertAddressSQL = String.format(insertAddressSQL, itemId, location[0], location[1], location[2],
+                        location[3], location[4]);
+                jdbcTemplate.update(insertAddressSQL);
+            } catch (Exception e) {
+                logger.error( "Error in newItem() addressInsertion\n" + e.getMessage());
+                e.printStackTrace();
+            }
+            return itemInsertSuccess;
         } catch (EmptyResultDataAccessException e) {
             return false;
         } catch (Exception e) {

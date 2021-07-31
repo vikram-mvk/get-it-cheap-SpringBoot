@@ -32,4 +32,10 @@ public class UserController {
         return userService.signUp(signUpRequest);
     }
 
+    @PostMapping(UserRoutes.UPDATE_PROFILE)
+    public ResponseEntity<?> updateProfile(@RequestBody UserEntity updateProfileRequest) {
+        return userService.updateProfile(updateProfileRequest);
+    }
+
+
 }

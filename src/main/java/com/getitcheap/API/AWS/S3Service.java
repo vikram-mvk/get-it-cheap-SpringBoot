@@ -19,6 +19,8 @@ public class S3Service {
             s3.putObject(BUCKET_NAME, filename, file);
             return true;
         } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }

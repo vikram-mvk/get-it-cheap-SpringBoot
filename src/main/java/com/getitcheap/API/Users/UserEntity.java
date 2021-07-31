@@ -46,19 +46,23 @@ public class UserEntity implements UserDetails {
         return this;
     }
 
+    @JsonProperty("firstName")
     public String getFirstName() {
         return this.firstName;
     }
 
+    @JsonProperty("firstName")
     public UserEntity setFirstName(String firstName) {
         this.firstName = firstName;
         return this;
     }
 
+    @JsonProperty("lastName")
     public String getLastName() {
         return this.lastName;
     }
 
+    @JsonProperty("lastName")
     public UserEntity setLastName(String lastName) {
         this.lastName = lastName;
         return this;
@@ -144,6 +148,16 @@ public class UserEntity implements UserDetails {
             }
         };
     }
+
+    public @interface columns {
+        String ID = "id";
+        String FIRST_NAME = "firstName";
+        String LAST_NAME = "lastName";
+        String EMAIL = "email";
+        String PASSWORD = "password";
+        String ACTIVE = "active";
+    }
+
 
 }
 

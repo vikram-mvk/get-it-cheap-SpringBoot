@@ -43,6 +43,10 @@ public class ItemService {
         return itemRepository.newItem(item);
     }
 
+    public boolean deleteItems(List<Long> ids) {
+        return itemRepository.deleteItems(ids);
+    }
+
     public List<ItemEntity> searchItems(String searchKey) {
         if (searchKey.isEmpty()) {
             return null;

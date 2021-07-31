@@ -1,3 +1,7 @@
+SET autocommit = 0;
+
+START TRANSACTION;
+
 CREATE TABLE IF NOT EXISTS users(
     id BIGINT NOT NULL UNIQUE AUTO_INCREMENT,
     firstName VARCHAR(100) NOT NULL,
@@ -5,16 +9,6 @@ CREATE TABLE IF NOT EXISTS users(
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL,
     active int NOT NULL,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE IF NOT EXISTS address(
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    itemLocation VARCHAR(255),
-    city VARCHAR(255),
-    state VARCHAR(255),
-    zipcode VARCHAR(255),
-    country VARCHAR(255),
     PRIMARY KEY (id)
 );
 
@@ -31,10 +25,24 @@ CREATE TABLE IF NOT EXISTS items(
     username VARCHAR(255) NOT NULL,
     contact VARCHAR(255) NOT NULL,
     itemLocation VARCHAR(255) NOT NULL,
-    addressId BIGINT,
     datePosted DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     active int,
-    FOREIGN KEY(addressId) REFERENCES address(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY(userId) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY(id)
 );
+
+CREATE TABLE IF NOT EXISTS address(
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    itemId BIGINT NOT NULL,
+    itemLocation VARCHAR(255),
+    city VARCHAR(255),
+    state VARCHAR(255),
+    zipcode VARCHAR(255),
+    country VARCHAR(255),
+    FOREIGN KEY(itemId) REFERENCES items(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    PRIMARY KEY (id)
+);
+
+COMMIT;
+
+SET autocommit = 1;

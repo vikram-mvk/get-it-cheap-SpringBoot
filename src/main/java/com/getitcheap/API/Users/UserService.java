@@ -15,6 +15,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
 public class UserService implements UserDetailsService {
@@ -46,6 +49,8 @@ public class UserService implements UserDetailsService {
 
             return ResponseEntity.ok(new JwtResponse(jwt,
                     user.getId(),
+                    user.getFirstName(),
+                    user.getLastName(),
                     user.getFullName(),
                     user.getEmail()));
         } catch (Exception e) {
@@ -64,6 +69,35 @@ public class UserService implements UserDetailsService {
         return successful ? ResponseEntity.ok().body(new MessageResponse("Signup Successful")) :
                 Utilities.getSomethingWentWrongResponse();
     }
+
+    public ResponseEntity<?> updateProfile(UserEntity updateProfileRequest) {
+
+        if (!userRepository.existsById(updateProfileRequest.getId())) {
+            return ResponseEntity.status(400).body(new MessageResponse("Account not found"));
+        }
+
+        List<String> attributes = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+        if (updateProfileRequest.getFirstName() != null) {
+            attributes.add(UserEntity.columns.FIRST_NAME);
+            values.add(updateProfileRequest.getFirstName());
+        }
+        if (updateProfileRequest.getLastName() != null) {
+            attributes.add(UserEntity.columns.LAST_NAME);
+            values.add(updateProfileRequest.getLastName());
+        }
+        if (updateProfileRequest.getEmail() != null) {
+            attributes.add(UserEntity.columns.EMAIL);
+            values.add(updateProfileRequest.getEmail());
+        }
+
+        boolean successful = userRepository.updateProfileAttributes(updateProfileRequest.getId(), attributes, values);
+
+        return successful ? ResponseEntity.ok().body(new MessageResponse("Update successful")) :
+                    ResponseEntity.internalServerError().body(new MessageResponse("Error updating profile information"));
+    }
+
+
 
     /**
      *  Method used by Spring Security

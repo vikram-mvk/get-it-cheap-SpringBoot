@@ -7,6 +7,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class UserRepository {
 
@@ -36,9 +38,43 @@ public class UserRepository {
             return jdbcTemplate.queryForObject(sql, Boolean.class, email);
         } catch (Exception e) {
             logger.error( "Error in existsByEmail()\n" + e.getMessage());
+            e.printStackTrace();
             return true;
         }
     }
+
+    boolean existsById(Long id) {
+        try {
+            String sql = "SELECT EXISTS (SELECT * FROM users WHERE id = ?)";
+            return jdbcTemplate.queryForObject(sql, Boolean.class, id);
+        } catch (Exception e) {
+            logger.error( "Error in existsByEmail()\n" + e.getMessage());
+            e.printStackTrace();
+            return true;
+        }
+    }
+
+    boolean updateProfileAttributes(Long id, List<String> attributes, List<String> values ) {
+        boolean success = true;
+        try {
+            for (int i=0; i<attributes.size(); i++) {
+                String sql = "UPDATE users SET %s = ? WHERE id = ?";
+                sql = String.format(sql, attributes.get(i));
+                success = success && jdbcTemplate.update(sql, values.get(i), id) > 0;
+                if (!success) {
+                    logger.error("Error updating "+attributes.get(i));
+                    break;
+                }
+            }
+            return success;
+        } catch (Exception e) {
+            logger.error( "Error in updateProfile()\n" + e.getMessage());
+            e.printStackTrace();
+            return true;
+        }
+    }
+
+
 
     boolean signUp(String firstName, String lastName, String email, String password) {
         try {
