@@ -1,5 +1,6 @@
 package com.getitcheap.API;
 
+import com.amazonaws.services.medialive.model.InputClippingSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.Scanner;
 
 @SpringBootApplication
 public class GetItCheapApiApplication implements ApplicationRunner {
@@ -32,11 +36,14 @@ public class GetItCheapApiApplication implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) {
 		try {
-			File sqlSetup = ResourceUtils.getFile("classpath:Database/create.sql");
-			String fileContents =  Files.readString(sqlSetup.toPath());
-			for (String query : fileContents.split(";")) {
-				jdbcTemplate.execute(query);
+			Resource resource = new ClassPathResource("Database/create.sql");
+			InputStream fileInputStream = resource.getInputStream();
+			Scanner scanner = new Scanner(fileInputStream);
+			scanner.useDelimiter(";");
+			while (scanner.hasNext()) {
+				jdbcTemplate.execute(scanner.next());
 			}
+
 		} catch (Exception e) {
 			logger.error(" Error in Setting up database \n"+e.getMessage());
 		}
