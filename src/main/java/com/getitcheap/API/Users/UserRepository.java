@@ -61,6 +61,9 @@ public class UserRepository {
                 String sql = "UPDATE users SET %s = ? WHERE id = ?";
                 sql = String.format(sql, attributes.get(i));
                 success = success && jdbcTemplate.update(sql, values.get(i), id) > 0;
+                String sqlUpdateItems = "UPDATE items SET username = (SELECT CONCAT(firstName,' ', lastName)" +
+                        " FROM users WHERE id = ?) WHERE userId = ?";
+                jdbcTemplate.update(sqlUpdateItems, id, id);
                 if (!success) {
                     logger.error("Error updating "+attributes.get(i));
                     break;
