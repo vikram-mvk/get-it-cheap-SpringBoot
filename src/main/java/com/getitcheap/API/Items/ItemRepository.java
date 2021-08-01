@@ -95,7 +95,7 @@ public class ItemRepository {
         try {
 
             for (Long id : ids) {
-                ItemEntity deletedItem =  jdbcTemplate.query(getItemSql, itemEntity.getRowMapper()).get(0);
+                ItemEntity deletedItem =  jdbcTemplate.query(getItemSql, itemEntity.getRowMapper(), id).get(0);
                 success = success && (jdbcTemplate.update(sql, id) > 0);
                 if (!success) {
                     break;
