@@ -7,6 +7,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class ItemRepository {
         try {
             String sql;
             if (hasLocationFilter) {
-                sql = "SELECT * FROM items WHERE active = 1 AND id " +
+                sql = "SELECT * FROM items WHERE itemType %s AND category %s AND active = 1 AND id " +
                         "IN (select itemId from address WHERE city %s AND state %s AND zipcode %s AND country %s)";
                 sql = String.format(sql, itemTypes, categories, itemCities, itemStates, itemZipCodes, itemCountries);
             } else {
@@ -85,25 +86,30 @@ public class ItemRepository {
         }
     }
 
-    boolean deleteItems(List<Long> ids) {
-        if (ids == null) {return false;}
+    List<ItemEntity> deleteItems(List<Long> ids) {
+        List<ItemEntity> deletedItems = new ArrayList<>();
+        if (ids == null) {return deletedItems; }
         boolean success = true;
         String sql = "DELETE from items where id = ?";
+        String getItemSql = "SELECT * from items where id = ?";
         try {
 
             for (Long id : ids) {
+                ItemEntity deletedItem =  jdbcTemplate.query(getItemSql, itemEntity.getRowMapper()).get(0);
                 success = success && (jdbcTemplate.update(sql, id) > 0);
                 if (!success) {
                     break;
+                } else {
+                    deletedItems.add(deletedItem);
                 }
             }
-            return success;
+            return deletedItems;
         } catch (EmptyResultDataAccessException e) {
-            return false;
+            return deletedItems;
         } catch (Exception e) {
             logger.error("Error in newItem()\n" + e.getMessage());
             e.printStackTrace();
-            return false;
+            return deletedItems;
         }
     }
 

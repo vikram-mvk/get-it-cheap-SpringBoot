@@ -14,9 +14,20 @@ public class S3Service {
 
     private final String BUCKET_NAME = "get-it-cheap";
 
-    public boolean uploadFile(String filename, File file) {
+    public boolean putObject(String filename, File file) {
         try {
             s3.putObject(BUCKET_NAME, filename, file);
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteObject(String key) {
+        try {
+            s3.deleteObject(BUCKET_NAME, key);
             return true;
         } catch (Exception e) {
             System.out.println(e.getMessage());

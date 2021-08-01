@@ -1,5 +1,6 @@
 package com.getitcheap.API.Items;
 
+import com.getitcheap.API.AWS.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,9 @@ public class ItemService {
 
     @Autowired
     ItemRepository itemRepository;
+
+    @Autowired
+    S3Service s3Service;
 
     public ItemEntity getItem(Long id) {
        return itemRepository.getItem(id);
@@ -44,7 +48,16 @@ public class ItemService {
     }
 
     public boolean deleteItems(List<Long> ids) {
-        return itemRepository.deleteItems(ids);
+        boolean success = true;
+        List<ItemEntity> deletedItems = itemRepository.deleteItems(ids);
+        if (deletedItems.isEmpty()) {
+            success = false;
+        } else {
+            for (ItemEntity item : deletedItems) {
+                success = success & s3Service.deleteObject(item.getImage());
+            }
+        }
+        return success;
     }
 
     public List<ItemEntity> searchItems(String searchKey) {
@@ -57,18 +70,20 @@ public class ItemService {
 
     private String getSqlQueryString(List<String> locationFilterValues) {
         String queryNoFilter = "LIKE '%'";
+        if (locationFilterValues == null || locationFilterValues.size() ==0) {
+            return queryNoFilter;
+        }
         String query = "";
         String queryFormat = ",'%s'";
 
-        if (locationFilterValues != null && locationFilterValues.size() > 0) {
-            for (String filterValue : locationFilterValues) {
-                query += String.format(queryFormat, filterValue);
-            }
-            query = query.substring(1);
-            query = String.format("IN (%s)", query);
-        } else {
-            query = queryNoFilter;
+        for (String filterValue : locationFilterValues) {
+            if (filterValue.equalsIgnoreCase("All")) { return queryNoFilter;}
+            // String filter = filterValue.replace("%20", " ");
+            query += String.format(queryFormat, filterValue);
         }
+        query = query.substring(1);
+        query = String.format("IN (%s)", query);
+
         return query;
     }
 

@@ -72,7 +72,7 @@ public class ItemController {
                 File imageFile = Utilities.convertMultiPartToFile(image);
                 String imageName = item.getItemName() + "_" + new Date().getTime() + ".jpeg";
 
-                success = s3Service.uploadFile(imageName, imageFile);
+                success = s3Service.putObject(imageName, imageFile);
                 if (success) {
                     item.setImage(imageName);
                 }
