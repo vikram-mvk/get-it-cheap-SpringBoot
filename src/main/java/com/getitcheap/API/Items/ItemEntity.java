@@ -132,7 +132,7 @@ public class ItemEntity {
     }
 
     @JsonProperty("price")
-    public double getPrice() {
+    public int getPrice() {
         return price;
     }
 
