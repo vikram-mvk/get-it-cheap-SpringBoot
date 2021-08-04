@@ -135,13 +135,20 @@ public class ItemRepository {
                     String city = null;
                     String localityOrHouseAddress = null;
                     try {
+                        int length = addressParts.length;
                         // Try to parse address
-                        country = addressParts[addressParts.length-1].strip();
-                        String[] temp = addressParts[addressParts.length -2].strip().split(" ");
-                        state = temp[0];
-                        if (temp.length == 2) {
-                            zipcode = temp[1];
+                        country = addressParts[length-1].strip();
+                        StringBuilder zipcodeTemp = new StringBuilder();
+                        StringBuilder stateTemp = new StringBuilder();
+                        for(int i=0; i<addressParts[length -2].length(); i++) {
+                            if (Character.isDigit(addressParts[length - 2].charAt(i))) {
+                                zipcodeTemp.append(addressParts[length - 2].charAt(i));
+                            } else {
+                                stateTemp.append(addressParts[length - 2].charAt(i));
+                            }
                         }
+                        state = stateTemp.toString().strip();
+                        zipcode = zipcodeTemp.length() > 0 ? zipcodeTemp.toString().strip() : null;
                         city = addressParts[addressParts.length -3].strip();
                         localityOrHouseAddress = addressParts[addressParts.length - 4].strip();
                     } catch (Exception e) {
