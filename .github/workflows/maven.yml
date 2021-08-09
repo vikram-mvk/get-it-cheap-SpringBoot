@@ -31,3 +31,10 @@ jobs:
         
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+      
+    - name: Deploy Web App to AWS
+      uses: pukonu/action-deploy-webapp-aws@v.1.1
+      with:
+        build_path: target/API-0.0.1-SNAPSHOT.jar
+        # The AWS S3 bucket you will like to deployt to
+        bucket_name: vikram-build-artifacts
