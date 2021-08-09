@@ -35,6 +35,8 @@ jobs:
     - name: Deploy Web App to AWS
       uses: pukonu/action-deploy-webapp-aws@v.1.1
       with:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         build_path: target/API-0.0.1-SNAPSHOT.jar
         # The AWS S3 bucket you will like to deployt to
         bucket_name: vikram-build-artifacts
