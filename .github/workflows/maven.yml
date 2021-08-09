@@ -32,11 +32,10 @@ jobs:
     - name: Build with Maven
       run: mvn --quiet -B package --file pom.xml
       
-    - name: Deploy Web App to AWS
-      uses: pukonu/action-deploy-webapp-aws@v.1.1
+    - name: webfactory/create-aws-codedeploy-deployment
+      # You may pin to the exact commit or the version.
+      # uses: webfactory/create-aws-codedeploy-deployment@cbc07d4e007319e31466e3677d0ae6be033e35e4
+      uses: webfactory/create-aws-codedeploy-deployment@v0.2.2
       with:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        build_path: target/API-0.0.1-SNAPSHOT.jar
-        # The AWS S3 bucket you will like to deployt to
-        bucket_name: vikram-build-artifacts
+        # AWS CodeDeploy application name; defaults to short repository name
+        application: getitcheap
