@@ -30,7 +30,7 @@ jobs:
         mysql password: password
         
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn --quiet -B package --file pom.xml
       
     - name: Deploy Web App to AWS
       uses: pukonu/action-deploy-webapp-aws@v.1.1
