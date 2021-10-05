@@ -32,7 +32,7 @@ jobs:
     - name: Build with Maven
       run: | 
         mvn --quiet -B package --file pom.xml
-        mv ./target/API-0.0.1-SNAPSHOT.jar ./target/API-0.0.1-SNAPSHOT.jar-${{ github.run_number }}
+        mv ./target/API-0.0.1-SNAPSHOT.jar ./getitcheap-${{ github.run_number}}.jar
         ls
       
     # Install AWS CLI 2
@@ -52,12 +52,12 @@ jobs:
 
     - uses: zdurham/s3-upload-github-action@master
       env:
-        FILE: ./target/API-0.0.1-SNAPSHOT-${{ github.run_number }}.jar
+        FILE: ./getitcheap-${{ github.run_number }}.jar
         AWS_REGION: 'us-east-1'
         S3_BUCKET: vikram-build-atrifacts
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     - name: "CodeDeploy"
-      run: aws deploy create-deployment --application-name get-it-cheap-code-deploy --deployment-group-name get-it-cheap-deployment-group --s3-location bucket=vikram-build-atrifacts,key=./target/API-0.0.1-SNAPSHOT-${{ github.run_number }}.jar
+      run: aws deploy create-deployment --application-name get-it-cheap-code-deploy --deployment-group-name get-it-cheap-deployment-group --s3-location bucket=vikram-build-atrifacts,key=getitcheap-${{ github.run_number}}.jar
    
