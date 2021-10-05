@@ -30,12 +30,34 @@ jobs:
         mysql password: password
         
     - name: Build with Maven
-      run: mvn --quiet -B package --file pom.xml
+      run: | 
+        mvn --quiet -B package --file pom.xml
+        pwd
+        ls
       
-    - name: webfactory/create-aws-codedeploy-deployment
-      # You may pin to the exact commit or the version.
-      # uses: webfactory/create-aws-codedeploy-deployment@cbc07d4e007319e31466e3677d0ae6be033e35e4
-      uses: webfactory/create-aws-codedeploy-deployment@v0.2.2
+    # Install AWS CLI 2
+    - name: Install AWS CLI 2
+      run: |
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install
+    # Configure AWS credentials
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        # AWS CodeDeploy application name; defaults to short repository name
-        application: getitcheap
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - uses: zdurham/s3-upload-github-action@master
+      env:
+        FILE: 'webapp-${{ github.run_number }}.zip'
+        AWS_REGION: 'us-east-1'
+        S3_BUCKET: vikram-build-atrifacts
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: "CodeDeploy"
+      run: aws deploy create-deployment --application-name get-it-cheap-code-deploy --deployment-group-name get-it-cheap-deployment-group --s3-location bucket=vikram-build-atrifacts,bundleType=zip,key=webapp-${{ github.run_number }}.zip
+   
