@@ -40,7 +40,7 @@ jobs:
       run: |
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
         unzip awscliv2.zip
-        sudo ./aws/install
+        sudo ./aws/install --update
     # Configure AWS credentials
     
     - name: Configure AWS credentials
@@ -52,7 +52,7 @@ jobs:
 
     - uses: zdurham/s3-upload-github-action@master
       env:
-        FILE: 'webapp-${{ github.run_number }}.zip'
+        FILE: ./target/API-0.0.1-SNAPSHOT.jar
         AWS_REGION: 'us-east-1'
         S3_BUCKET: vikram-build-atrifacts
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
